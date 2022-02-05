@@ -7,12 +7,12 @@ extends Node2D
 
 export var boid_radius = 1000
 
-export var boid_r1_separation = 0.5
+export var boid_r1_separation = 0.4
 
 export var boid_r2_cohesion = 0.05
 export var boid_r2_target_dist = 15
 
-export var boid_r3_alignment = 0.001
+export var boid_r3_alignment = 0.005
 
 export var boid_target_bias = 10
 
@@ -36,7 +36,7 @@ func _process(delta):
 		if boid == self:
 			continue
 		
-		if self.position.distance_to(boid.position) <= boid_radius:
+		if position.distance_to(boid.position) <= boid_radius:
 			boids.append(boid)
 	
 	# rule 1
@@ -44,10 +44,10 @@ func _process(delta):
 	for buddy in boids:
 		centroid += buddy.position
 	if len(boids) == 0:
-		centroid = self.position
+		centroid = position
 	else:
 		centroid /= len(boids)
-	var delta_centroid = centroid - self.position
+	var delta_centroid = centroid - position
 	velocity += delta_centroid * delta * boid_r1_separation
 	
 	# rule 2
@@ -67,7 +67,7 @@ func _process(delta):
 		velocity += delta_v * boid_r3_alignment
 		
 	# rule 1 w/ target
-	velocity += (target - self.position) * delta * boid_r1_separation * boid_target_bias
+	velocity += (target - position) * delta * boid_r1_separation * boid_target_bias
 	# rule 2 w/ target
 	velocity += -((target-position) * boid_r2_cohesion / ((target-position).length() / boid_r2_target_dist)) * boid_target_bias
 	
@@ -75,4 +75,4 @@ func _process(delta):
 		velocity = velocity.normalized() * boid_max_vel
 	
 	# apply velocity
-	self.position += velocity * delta
+	position += velocity * delta

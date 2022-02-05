@@ -16,27 +16,27 @@ var boid_controller: Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	grid_q1 = get_node("../map/grid-q1")
-	grid_q2 = get_node("../map/grid-q2")
-	grid_q3 = get_node("../map/grid-q3")
-	grid_q4 = get_node("../map/grid-q4")
+	grid_q1 = get_node("../bg/grid-q1")
+	grid_q2 = get_node("../bg/grid-q2")
+	grid_q3 = get_node("../bg/grid-q3")
+	grid_q4 = get_node("../bg/grid-q4")
 	
 	grid_q1.visible = true
 	grid_q2.visible = true
 	grid_q3.visible = true
 	grid_q4.visible = true
 	
-	boid_controller = get_node("../boidcontrol")
+	boid_controller = get_node("../boidcontrol-player")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	self.position = boid_controller.get_boid_center()
+	# self.position = boid_controller.get_boid_center()
 	var boid_bounds = boid_controller.bound_boids()
 	var boid_mi = boid_bounds[0]
 	var boid_ma = boid_bounds[1]
 	# self.zoom = (boid_ma - boid_mi) / 500
 	
-	var cam_pos = self.position
+	var cam_pos = position
 	var world_delta = cam_pos - world_center
 
 	var grid_size = grid_q1.get_rect().size
