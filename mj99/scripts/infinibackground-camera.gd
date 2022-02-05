@@ -1,0 +1,49 @@
+extends Camera2D
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = "text"
+
+export var world_center = Vector2(0, 0)
+
+var grid_q1: Sprite
+var grid_q2: Sprite
+var grid_q3: Sprite
+var grid_q4: Sprite
+
+var boid_controller: Node
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	grid_q1 = get_node("../map/grid-q1")
+	grid_q2 = get_node("../map/grid-q2")
+	grid_q3 = get_node("../map/grid-q3")
+	grid_q4 = get_node("../map/grid-q4")
+	
+	grid_q1.visible = true
+	grid_q2.visible = true
+	grid_q3.visible = true
+	grid_q4.visible = true
+	
+	boid_controller = get_node("../boidcontrol")
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	self.position = boid_controller.get_boid_center()
+	var boid_bounds = boid_controller.bound_boids()
+	var boid_mi = boid_bounds[0]
+	var boid_ma = boid_bounds[1]
+	# self.zoom = (boid_ma - boid_mi) / 500
+	
+	var cam_pos = self.position
+	var world_delta = cam_pos - world_center
+
+	var grid_size = grid_q1.get_rect().size
+	var dx = round(world_delta.x / grid_size.x) * grid_size.x
+	var dy = round(world_delta.y / grid_size.y) * grid_size.y
+	
+	grid_q1.position = Vector2(dx+grid_size.x/2, dy+grid_size.y/2)
+	grid_q2.position = Vector2(dx-grid_size.x/2, dy+grid_size.y/2)
+	grid_q3.position = Vector2(dx-grid_size.x/2, dy-grid_size.y/2)
+	grid_q4.position = Vector2(dx+grid_size.x/2, dy-grid_size.y/2)
