@@ -52,19 +52,17 @@ width = 1.0
 [node name="boidcontrol-player" type="Node" parent="."]
 script = ExtResource( 3 )
 
-[node name="capturepoints" type="Node" parent="."]
+[node name="capturepoints" type="Node2D" parent="."]
 script = ExtResource( 4 )
 
 [node name="capturepoint-1" type="Node2D" parent="capturepoints"]
 position = Vector2( 178, -93 )
 script = ExtResource( 5 )
-capture_radius = 250
 
 [node name="capturepoint-2" type="Node2D" parent="capturepoints"]
-position = Vector2( -230, 128 )
+position = Vector2( -144, -104 )
 script = ExtResource( 5 )
-capture_radius = 250
 
 [node name="capturepoint-3" type="Node2D" parent="capturepoints"]
+position = Vector2( 103, 34 )
 script = ExtResource( 5 )
-capture_radius = 250

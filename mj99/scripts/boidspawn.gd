@@ -1,5 +1,6 @@
 extends Node
 
+const enums = preload("res://scripts/enums.gd")
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -12,6 +13,8 @@ export var vel_r = 50
 var boid = preload("res://prefabs/boid.tscn")
 var cam: Node
 var boid_drag_poly: Node
+
+export var faction = enums.FACTION_PLAYER
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

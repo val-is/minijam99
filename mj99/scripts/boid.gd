@@ -1,35 +1,45 @@
 extends Node2D
 
+const enums = preload("res://scripts/enums.gd")
 
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
 
-export var boid_radius = 1000
+export var boid_radius = 200
 
-export var boid_r1_separation = 0.4
+export var boid_r1_separation = 20
 
-export var boid_r2_cohesion = 0.05
-export var boid_r2_target_dist = 15
+export var boid_r2_cohesion = 1
+export var boid_r2_target_dist = 0.001
 
-export var boid_r3_alignment = 0.005
+export var boid_r3_alignment = 0.05
 
-export var boid_target_bias = 10
+export var boid_target_bias = 20
+export var boid_target_r2_dist_bias = 0.1
 
-export var boid_max_vel = 350
+export var boid_max_vel = 100
 
 var target = Vector2(0, 0)
 
 var boid_root: Node
 var velocity = Vector2(0, 0)
 
+export var personality_range: Vector2 = Vector2(0.7, 1.2)
+var personality = 1
+
+export var max_dtheta = 3.141 / 60
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	boid_root = get_node("..")
-
+	target = position + Vector2(0.01, 0.01)
+	personality = rand_range(personality_range.x, personality_range.y)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	var old_vel = velocity
+	
 	var boids_raw = boid_root.get_children()
 	var boids = []
 	for boid in boids_raw:
@@ -69,10 +79,25 @@ func _process(delta):
 	# rule 1 w/ target
 	velocity += (target - position) * delta * boid_r1_separation * boid_target_bias
 	# rule 2 w/ target
-	velocity += -((target-position) * boid_r2_cohesion / ((target-position).length() / boid_r2_target_dist)) * boid_target_bias
+	velocity += -((target-position) * boid_r2_cohesion / ((target-position).length() / boid_target_r2_dist_bias)) * boid_target_bias
 	
 	if velocity.length() > boid_max_vel:
 		velocity = velocity.normalized() * boid_max_vel
 	
+	# rotate towards target velocity
+	var new_speed = velocity.length()
+	new_speed = clamp(new_speed, 0.1*boid_max_vel, boid_max_vel)
+	
+	var new_orientation = velocity.normalized().angle()
+	var old_orientation = old_vel.normalized().angle()
+	
+	var d_theta = new_orientation - old_orientation
+	d_theta = clamp(d_theta, -max_dtheta, max_dtheta)
+	velocity = Vector2(1, 0).rotated(old_orientation + d_theta) * new_speed
+	
 	# apply velocity
-	position += velocity * delta
+	position += velocity * delta * personality
+	
+	# rotate towards front
+	var orientation = velocity.normalized().angle()
+	rotation = orientation + 3.141 / 2
