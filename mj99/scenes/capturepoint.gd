@@ -17,7 +17,7 @@ export var max_health = 20
 var health = max_health
 export var heal_rate = 1
 
-export var boid_spawn_delay = 5
+export var boid_spawn_delay = 10
 
 var boid = preload("res://prefabs/boid.tscn")
 

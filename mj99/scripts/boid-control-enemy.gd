@@ -42,7 +42,7 @@ func _ready():
 
 export var boid_grouping_distance = 100
 
-export var ai_resupply_target_capacity = 3
+export var ai_resupply_target_capacity = 10
 export var ai_group_dist = 50 # make sure units stay in this radius if in a strike group when resupplying
 
 export var ai_defend_range = 100 # radius around a captured point to keep clear
@@ -105,7 +105,6 @@ func reassign_group(idx):
 	threatened_points.sort_custom(AIGroupSorter, "sort_by_distance")
 	threatened_points.invert() # go to most aggressed point
 	if len(threatened_points) != 0:
-		print("defending!")
 		strike_groups[idx]["mission"] = MISSION_DEFEND
 		strike_groups[idx]["target"] = threatened_points[0][1].position
 		strike_groups[idx]["defend_target"] = threatened_points[0][1]
@@ -176,11 +175,28 @@ func reassign_group(idx):
 	if len(player_group_strengths) != 0:
 		# attack the first group here
 		strike_groups[idx]["mission"] = MISSION_INTERCEPT
-		strike_groups[idx]["target"] = player_group_strengths[0][1][0].position
+		strike_groups[idx]["target"] = player_group_strengths[0][1][0].target
 		return
 	
 	# see if we can attack any player nodes
-	# TODO
+	var player_nodes = []
+	for point in get_node("../capturepoints").get_children():
+		if point.controller == enums.FACTION_PLAYER:
+			player_nodes.append(point)
+	var player_nodes_defended = []
+	for node in player_nodes:
+		var defenders = 0
+		for player_boid in get_node("../boidcontrol-player"):
+			if player_boid.position.distance_to(node.position) < ai_defend_range:
+				defenders += 1
+		if defenders < len(group["boids"]):
+			player_nodes_defended.append([defenders, node])
+	player_nodes_defended.sort_custom(AIGroupSorter, "sort_by_distance")
+	if len(player_nodes_defended) != 0:
+		strike_groups[idx]["mission"] = MISSION_CAPTURE
+		strike_groups[idx]["target"] = player_nodes_defended[0][1].position
+		strike_groups[idx]["capture_target"] = player_nodes_defended[0][1]
+		return
 	
 	# group up with a resupply to bolster strength
 	var closest_groups = []
@@ -354,6 +370,6 @@ func process_ai():
 		
 	# apply logic to boid underlings
 	for group in strike_groups:
-		print(len(group["boids"]))
+		print("group, mission: ", group["mission"], ", size: ", len(group["boids"]))
 		for boid in group["boids"]:
 			boid.target = group["target"]

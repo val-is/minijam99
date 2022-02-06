@@ -57,14 +57,16 @@ script = ExtResource( 3 )
 script = ExtResource( 4 )
 
 [node name="capturepoint-1" type="Node2D" parent="capturepoints"]
-position = Vector2( 337, -157 )
+position = Vector2( 351, -187 )
 script = ExtResource( 5 )
-max_health = 1
 
 [node name="capturepoint-2" type="Node2D" parent="capturepoints"]
-position = Vector2( -406, -141 )
+position = Vector2( -399, -177 )
 script = ExtResource( 5 )
-max_health = 1
+
+[node name="capturepoint-3" type="Node2D" parent="capturepoints"]
+position = Vector2( -12, 221 )
+script = ExtResource( 5 )
 
 [node name="boidcontrol-enemy" type="Node" parent="."]
 script = ExtResource( 6 )
