@@ -6,8 +6,9 @@ const enums = preload("res://scripts/enums.gd")
 # var a = 2
 # var b = "text"
 
+export var spawn_point = Vector2(-400, 0)
 export var n_boids = 5
-export var boid_scattering_range = 500
+export var boid_scattering_range = 50
 export var vel_r = 50
 
 var boid = preload("res://prefabs/boid.tscn")
@@ -20,8 +21,9 @@ export var faction = enums.FACTION_PLAYER
 func _ready():
 	for i in range(n_boids):
 		var b = boid.instance()
-		b.position = Vector2(rand_range(-boid_scattering_range, boid_scattering_range), rand_range(-boid_scattering_range, boid_scattering_range))
+		b.position = spawn_point + Vector2(rand_range(-boid_scattering_range, boid_scattering_range), rand_range(-boid_scattering_range, boid_scattering_range))
 		b.velocity = Vector2(rand_range(-vel_r, vel_r), rand_range(-vel_r, vel_r))
+		b.faction = faction
 		add_child(b)
 	cam = get_node("../camera")
 	boid_drag_poly = get_node("../boidpolydragsquare")

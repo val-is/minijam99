@@ -8,7 +8,7 @@ const enums = preload("res://scripts/enums.gd")
 
 export var boid_radius = 200
 
-export var boid_r1_separation = 20
+export var boid_r1_separation = 50
 
 export var boid_r2_cohesion = 1
 export var boid_r2_target_dist = 0.001
@@ -25,10 +25,15 @@ var target = Vector2(0, 0)
 var boid_root: Node
 var velocity = Vector2(0, 0)
 
+export var view_angle = 50
+export var view_dist = 100
+
 export var personality_range: Vector2 = Vector2(0.7, 1.2)
 var personality = 1
 
 export var max_dtheta = 3.141 / 60
+
+export var faction = enums.FACTION_NEUTRAL
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -38,12 +43,16 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if target == position:
+		target += Vector2(0.1, 0.1)
 	var old_vel = velocity
 	
 	var boids_raw = boid_root.get_children()
 	var boids = []
 	for boid in boids_raw:
 		if boid == self:
+			continue
+		if boid.faction != faction:
 			continue
 		
 		if position.distance_to(boid.position) <= boid_radius:
@@ -101,3 +110,19 @@ func _process(delta):
 	# rotate towards front
 	var orientation = velocity.normalized().angle()
 	rotation = orientation + 3.141 / 2
+	
+	update()
+
+func draw_circle_arc(center, radius, angle_from, angle_to, color):
+	var nb_points = 15
+	var points_arc = PoolVector2Array()
+
+	for i in range(nb_points + 1):
+		var angle_point = deg2rad(angle_from + i * (angle_to-angle_from) / nb_points - 90)
+		points_arc.push_back(center + Vector2(cos(angle_point), sin(angle_point)) * radius)
+
+	for index_point in range(nb_points):
+		draw_line(points_arc[index_point], points_arc[index_point + 1], color)
+
+func _draw():
+	draw_circle_arc(Vector2(0, 0), view_dist+50, -view_angle/2, view_angle/2, Color.red)

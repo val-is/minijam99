@@ -30,6 +30,7 @@ var faction_colors = {
 var _timer = null
 var _spawn_timer = null
 var boid_control_player: Node
+var boid_control_enemy: Node
 
 var cam: Camera2D
 
@@ -48,6 +49,7 @@ func _ready():
 	_spawn_timer.set_one_shot(false) # Make sure it loops
 	
 	boid_control_player = get_node("../../boidcontrol-player")
+	boid_control_enemy = get_node("../../boidcontrol-enemy")
 	cam = get_node("../../camera")
 
 func update_cap_point():
@@ -57,6 +59,10 @@ func update_cap_point():
 	for p_boid in boid_control_player.get_children():
 		if position.distance_to(p_boid.position) < capture_radius:
 			p_boid_count += 1
+	
+	for e_boid in boid_control_enemy.get_children():
+		if position.distance_to(e_boid.position) < capture_radius:
+			e_boid_count += 1
 	
 	var contested = ((controller != enums.FACTION_PLAYER and p_boid_count != 0) or
 					(controller != enums.FACTION_ENEMY and e_boid_count != 0))
@@ -80,9 +86,13 @@ func update_cap_point():
 func attempt_spawn():
 	var b = boid.instance()
 	b.position = position
+	b.faction = controller
 	# b.target = position
-	boid_control_player.add_child(b)
-	print(b.target)
+	match controller:
+		enums.FACTION_ENEMY:
+			boid_control_enemy.add_child(b)
+		enums.FACTION_PLAYER:
+			boid_control_player.add_child(b)
 
 func _draw():
 	draw_circle(Vector2(0, 0), capture_radius, faction_colors[controller])
